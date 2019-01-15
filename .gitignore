@@ -1,2 +1,5 @@
-/certs
-/html
+/certs/*
+/html/*
+/vhost.d/*
+/conf.d/*.*
+!/conf.d/uploadsize.conf
