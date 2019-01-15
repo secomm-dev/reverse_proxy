@@ -1,27 +1,33 @@
-version: "2"
+version: "3"
+
 services:
   nginx-proxy:
     image: secomm/nginx-proxy
     container_name: nginx-proxy
     ports:
-      - '80:80'
-      - '443:443'
+      - "80:80"
+      - "443:443"
     volumes:
-      - '/etc/nginx/vhost.d'
-      - '/usr/share/nginx/html'
-      - './certs:/etc/nginx/certs:ro' 
-      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+      - ./certs:/etc/nginx/certs:ro
+      - vhostd:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: always
 
-  letsencrypt-nginx-proxy:
-    container_name: letsencrypt-nginx-proxy
+  nginx-proxy-letsencrypt:
     image: 'jrcs/letsencrypt-nginx-proxy-companion'
+    container_name: nginx-proxy-letsencrypt
     volumes:
-      - './certs:/etc/nginx/certs:rw'
-      - '/var/run/docker.sock:/var/run/docker.sock:ro'
-    volumes_from:
-      - nginx-proxy
+      - ./certs:/etc/nginx/certs
+      - vhostd:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
+volumes: 
+  vhostd:
 
-networks:
+networks: 
   default:
     external:
-      name: nginx-proxy-net
+      name: reverse-proxy
